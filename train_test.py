@@ -27,8 +27,8 @@ def train_model(model, train_loader, val_loader, scheduler, train_idx, criterion
     best_MCC = 0
     best_val_f1 = 0.0
 
-    epochs_no_improve = 0  # Early stopping 计数器
-    patience = 100          # 超过 30 轮没有提升就停止
+    epochs_no_improve = 0
+    patience = 100
 
     for epoch in tqdm(range(5000)):
         model.train()
@@ -47,7 +47,7 @@ def train_model(model, train_loader, val_loader, scheduler, train_idx, criterion
         avg_loss = total_loss / batch_count if batch_count > 0 else 0.0
         print(f"Epoch {epoch + 1}: Train Loss = {avg_loss:.8f}")
 
-        # 验证
+        # val
         model.eval()
         all_preds, all_labels = [], []
         misclassified_indices = []
@@ -91,7 +91,7 @@ def train_model(model, train_loader, val_loader, scheduler, train_idx, criterion
 
         scheduler.step()
 
-        # Early stopping 检查
+        # Early stopping
         if epochs_no_improve >= patience:
             print(f"Early stopping at epoch {epoch + 1} — 超过 {patience} 个 epoch 验证集 F1 无提升")
             break
