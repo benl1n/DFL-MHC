@@ -19,10 +19,10 @@ def main():
     save_dir = "./pca_data"
     os.makedirs(save_dir, exist_ok=True)
 
-    data1 = pd.read_csv('features/MHC_ESM.csv')
-    data2 = pd.read_csv('features/MHC_ESM2-650M.csv')
-    data3 = pd.read_csv('features/MHC_ESM1b-650M.csv')
-    data4 = pd.read_csv('features/MHC_ESM2.csv')
+    data1 = pd.read_csv('features/MHC_ESM1b_1.csv')
+    data2 = pd.read_csv('features/MHC_ESM2_1.csv')
+    data3 = pd.read_csv('features/MHC_ESM1b_2.csv')
+    data4 = pd.read_csv('features/MHC_ESM2_2.csv')
 
     labels = data1.iloc[:, 0].values
     f1 = data1.iloc[:, 1:].values

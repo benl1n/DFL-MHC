@@ -16,9 +16,7 @@ all_train_sp = []
 all_train_mcc = []
 
 all_test_acc = []
-all_test_sn = []
-all_test_sp = []
-all_test_mcc = []
+
 
 
 def train_model(model, train_loader, val_loader, scheduler, train_idx, criterion, optimizer, device, save_path):
@@ -70,8 +68,8 @@ def train_model(model, train_loader, val_loader, scheduler, train_idx, criterion
         all_preds = torch.cat(all_preds).cpu().numpy().flatten()
         all_labels = torch.cat(all_labels).cpu().numpy().flatten()
         acc = round(accuracy_score(all_labels, all_preds), 4)
-        sn = round(precision_score(all_labels, all_preds, average='macro'), 4)
-        sp = round(recall_score(all_labels, all_preds, average='macro'), 4)
+        sn = round(recall_score(all_labels, all_preds, average='macro'), 4)
+        sp = round(precision_score(all_labels, all_preds, average='macro'), 4)
         mcc = round(matthews_corrcoef(all_labels, all_preds), 4)
         f1 = f1_score(all_labels, all_preds, average='macro')
 
@@ -103,6 +101,7 @@ def train_model(model, train_loader, val_loader, scheduler, train_idx, criterion
     all_train_sp.append(best_sp)
     all_train_mcc.append(best_MCC)
 
+    return best_val_f1
 
 def test_model(model, test_loader, test_idx,device):
 
@@ -131,8 +130,8 @@ def test_model(model, test_loader, test_idx,device):
     all_preds = torch.cat(all_preds).cpu().numpy().flatten()
     all_labels = torch.cat(all_labels).cpu().numpy().flatten()
     acc = round(accuracy_score(all_labels, all_preds), 4)
-    sn = round(precision_score(all_labels, all_preds, average='macro'), 4)
-    sp = round(recall_score(all_labels, all_preds, average='macro'), 4)
+    sn = round(recall_score(all_labels, all_preds, average='macro'), 4)
+    sp = round(precision_score(all_labels, all_preds, average='macro'), 4)
     mcc = round(matthews_corrcoef(all_labels, all_preds), 4)
     f1 = f1_score(all_labels, all_preds, average='macro')
 
@@ -164,6 +163,9 @@ def main():
     test_loader = DataLoader(test_dataset, batch_size=32)
 
     skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+
+    global_best_f1 = 0
+    global_best_model_path = None
 
     for fold, (train_split_idx, val_split_idx) in enumerate(skf.split(X_train, y_train)):
         print(f"\n=== Fold {fold} ===")
@@ -203,7 +205,7 @@ def main():
         save_path = f"best_model_fold_{fold}.pt"
 
         # train
-        train_model(model,
+        best_f1 = train_model(model,
                     train_loader,
                     val_loader,
                     scheduler,
@@ -215,18 +217,23 @@ def main():
 
         # test
         model.load_state_dict(torch.load(save_path))
-        test_model(
-            model,
-            test_loader,
-            test_idx,
-            device
-        )
+
+        if best_f1 > global_best_f1:
+            global_best_f1 = best_f1
+            global_best_model_path = save_path
 
     print(f"Train Result: ACC:{round(statistics.mean(all_train_acc), 4)}, SN:{round(statistics.mean(all_train_sn), 4)},"
           f"SP:{round(statistics.mean(all_train_sp), 4)}, MCC:{round(statistics.mean(all_train_mcc), 4)}")
 
-    print(f"Test Result: ACC:{round(statistics.mean(all_test_acc), 4)}, SN:{round(statistics.mean(all_test_sn), 4)},"
-          f"SP:{round(statistics.mean(all_test_sp), 4)}, MCC:{round(statistics.mean(all_test_mcc), 4)}")
+    final_model = DFL_MHC().to(device)
+    final_model.load_state_dict(torch.load(global_best_model_path))
+
+    test_model(
+        final_model,
+        test_loader,
+        test_idx,
+        device
+    )
 
 if __name__ == '__main__':
     main()
