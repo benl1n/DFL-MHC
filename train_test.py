@@ -147,7 +147,7 @@ def test_model(model, test_loader, test_idx,device):
 
 def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    save_dir = 'pca_fold_data'
+    save_dir = 'pca_data'
     X_train = np.load(f"{save_dir}/best_train_X.npy")
     y_train = np.load(f"{save_dir}/best_train_y.npy")
     train_idx = np.load(f"{save_dir}/best_train_idx.npy")
