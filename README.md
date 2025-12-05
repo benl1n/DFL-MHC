@@ -8,7 +8,11 @@ DFL-MHC is a dual-stage learning framework for MHC protein identification that i
 
 ## 2. Python Environment
 
+Python 3.10 and packages version:
 
+- 
+
+- 
 
 
 
@@ -16,19 +20,25 @@ DFL-MHC is a dual-stage learning framework for MHC protein identification that i
 
 ## 3.Prediction
 
-1. search the best feature 
+1. Using Git:
+
+```
+git clone https://github.com/benl1n/DFL-MHC.git
+```
+
+2. search the best feature 
 
 ```python
 python first_stage.py
 ```
 
-2. get the best feature
+3. get the best feature
 
 ```
 python process_features.py
 ```
 
-3. get the result of MHC prediction
+4. get the result of MHC prediction
 
 ```
 python train_test.py
