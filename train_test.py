@@ -21,8 +21,6 @@ all_test_sp = []
 all_test_mcc = []
 
 
-
-
 def train_model(model, train_loader, val_loader, scheduler, train_idx, criterion, optimizer, device, save_path):
 
     best_acc = 0
@@ -129,7 +127,6 @@ def test_model(model, test_loader, test_idx,device):
 
             all_preds.append(preds.cpu())
             all_labels.append(yb.cpu())
-    true_misclassified_idx = [test_idx[i] for i in misclassified_indices]
 
     all_preds = torch.cat(all_preds).cpu().numpy().flatten()
     all_labels = torch.cat(all_labels).cpu().numpy().flatten()
@@ -152,13 +149,13 @@ def test_model(model, test_loader, test_idx,device):
 def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     save_dir = 'pca_fold_data'
-    X_train = np.load(f"{save_dir}/holdout_224_train_X.npy")
-    y_train = np.load(f"{save_dir}/holdout_224_train_y.npy")
-    train_idx = np.load(f"{save_dir}/holdout_224_train_idx.npy")
+    X_train = np.load(f"{save_dir}/best_train_X.npy")
+    y_train = np.load(f"{save_dir}/best_train_y.npy")
+    train_idx = np.load(f"{save_dir}/best_train_idx.npy")
 
-    X_test = np.load(f"{save_dir}/holdout_224_test_X.npy")
-    y_test = np.load(f"{save_dir}/holdout_224_test_y.npy")
-    test_idx = np.load(f"{save_dir}/holdout_224_test_idx.npy")
+    X_test = np.load(f"{save_dir}/best_test_X.npy")
+    y_test = np.load(f"{save_dir}/best_test_y.npy")
+    test_idx = np.load(f"{save_dir}/best_test_idx.npy")
 
     test_dataset = TensorDataset(
         torch.tensor(X_test, dtype=torch.float32),
@@ -188,11 +185,8 @@ def main():
         train_loader = DataLoader(train_set, batch_size=32, shuffle=True)
         val_loader = DataLoader(val_set, batch_size=32)
 
-        # ✅ 原始索引（用于错误样本回溯）
-        train_sub_idx = train_idx[train_split_idx]
         val_sub_idx = train_idx[val_split_idx]
 
-        # ✅ 模型
         model = DFL_MHC().to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(
@@ -228,10 +222,10 @@ def main():
             device
         )
 
-    print(f"Result: ACC:{round(statistics.mean(all_train_acc), 4)}, SN:{round(statistics.mean(all_train_sn), 4)},"
+    print(f"Train Result: ACC:{round(statistics.mean(all_train_acc), 4)}, SN:{round(statistics.mean(all_train_sn), 4)},"
           f"SP:{round(statistics.mean(all_train_sp), 4)}, MCC:{round(statistics.mean(all_train_mcc), 4)}")
 
-    print(f"Result: ACC:{round(statistics.mean(all_test_acc), 4)}, SN:{round(statistics.mean(all_test_sn), 4)},"
+    print(f"Test Result: ACC:{round(statistics.mean(all_test_acc), 4)}, SN:{round(statistics.mean(all_test_sn), 4)},"
           f"SP:{round(statistics.mean(all_test_sp), 4)}, MCC:{round(statistics.mean(all_test_mcc), 4)}")
 
 if __name__ == '__main__':

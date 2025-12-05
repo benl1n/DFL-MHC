@@ -54,13 +54,13 @@ def main():
     X_train_pca = pca.fit_transform(X_train)
     X_test_pca = pca.transform(X_test)
 
-    np.save(f"{save_dir}/_224_train_X.npy", X_train_pca)
-    np.save(f"{save_dir}/_224_train_y.npy", y_train)
-    np.save(f"{save_dir}/_224_train_idx.npy", train_idx)
+    np.save(f"{save_dir}/best_train_X.npy", X_train_pca)
+    np.save(f"{save_dir}/best_train_y.npy", y_train)
+    np.save(f"{save_dir}/best_train_idx.npy", train_idx)
 
-    np.save(f"{save_dir}/_224_test_X.npy", X_test_pca)
-    np.save(f"{save_dir}/_224_test_y.npy", y_test)
-    np.save(f"{save_dir}/_224_test_idx.npy", test_idx)
+    np.save(f"{save_dir}/best_test_X.npy", X_test_pca)
+    np.save(f"{save_dir}/best_test_y.npy", y_test)
+    np.save(f"{save_dir}/best_test_idx.npy", test_idx)
 
     model = MLPClassifier(random_state=0)
     model.fit(X_train_pca, y_train)
